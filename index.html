@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auditoría SEO — grupotudescanso.com</title>
+<style>
+  :root {
+    --bg: #f9f9f8;
+    --surface: #ffffff;
+    --border: #e5e5e3;
+    --border-strong: #c8c8c4;
+    --text: #111110;
+    --text-muted: #6f6f6b;
+    --text-faint: #a8a8a3;
+    --accent: #111110;
+    --err: #c0392b;
+    --warn: #b7770d;
+    --ok: #2e7d52;
+    --err-bg: #fdf2f2;
+    --warn-bg: #fdf8ef;
+    --ok-bg: #f0faf4;
+    --score-bad: #c0392b;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 15px; -webkit-font-smoothing: antialiased; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+  /* NAV */
+  nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+  }
+  nav a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: .02em;
+    padding: 14px 16px;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color .15s, border-color .15s;
+  }
+  nav a:hover { color: var(--text); border-bottom-color: var(--border-strong); }
+  .nav-brand {
+    margin-right: auto;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-faint);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 14px 0;
+    white-space: nowrap;
+    padding-right: 32px;
+    border-right: 1px solid var(--border);
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 56px 40px 48px;
+  }
+  .header-inner {
+    max-width: 1060px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 40px;
+    align-items: center;
+  }
+  .header-left { display: flex; flex-direction: column; gap: 20px; }
+  .header-meta { display: flex; align-items: center; gap: 12px; }
+  .header-logo {
+    height: 36px;
+    width: auto;
+    filter: none;
+    display: block;
+  }
+  .header-divider { width: 1px; height: 28px; background: var(--border); }
+  .header-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+  .header-url {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -.02em;
+    line-height: 1.2;
+  }
+  .header-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .header-tech {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .tech-tag {
+    font-size: 11.5px;
+    padding: 3px 9px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  /* SCORE BOX */
+  .score-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--err-bg);
+    border: 1px solid #f5c6c3;
+    border-radius: 12px;
+    padding: 28px 36px;
+    min-width: 160px;
+    text-align: center;
+  }
+  .score-num { font-size: 64px; font-weight: 800; color: var(--err); line-height: 1; letter-spacing: -.04em; }
+  .score-den { font-size: 16px; color: var(--text-faint); margin-bottom: 8px; }
+  .score-verdict {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--err);
+    background: rgba(192,57,43,.1);
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+
+  /* CONTAINER */
+  .container { max-width: 1060px; margin: 0 auto; padding: 48px 40px; }
+  section { margin-bottom: 56px; }
+
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* TARJETAS RESUMEN */
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .card { background: var(--surface); padding: 28px 24px; text-align: left; }
+  .card-num { font-size: 40px; font-weight: 800; line-height: 1; letter-spacing: -.03em; }
+  .card-label { font-size: 12px; color: var(--text-muted); margin-top: 6px; font-weight: 500; }
+  .card.err .card-num { color: var(--err); }
+  .card.warn .card-num { color: var(--warn); }
+  .card.ok .card-num { color: var(--ok); }
+  .card.score .card-num { color: var(--err); }
+
+  /* CORRECCIONES */
+  .fix-list { display: flex; flex-direction: column; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .fix { background: var(--surface); padding: 24px 28px; display: grid; grid-template-columns: 40px 1fr; gap: 16px; align-items: start; }
+  .fix-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--err);
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .fix.warn .fix-num { background: var(--warn); }
+  .fix-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+  .fix-why { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.55; }
+  .fix-label { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 4px; }
+  pre.code {
+    background: #1c1c1b;
+    color: #c8e6c0;
+    padding: 14px 18px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    line-height: 1.6;
+    margin-top: 8px;
+  }
+
+  /* CATEGORÍAS */
+  .cat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .cat-card { background: var(--surface); padding: 24px 28px; }
+  .cat-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+  .cat-name { font-size: 13.5px; font-weight: 700; color: var(--text); }
+  .cat-weight { font-size: 11px; color: var(--text-faint); margin-left: 6px; font-weight: 400; }
+  .cat-score { font-size: 22px; font-weight: 800; letter-spacing: -.02em; }
+  .cat-score.err { color: var(--err); }
+  .cat-score.warn { color: var(--warn); }
+  .cat-score.ok { color: var(--ok); }
+  .progress-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin: 10px 0 16px; }
+  .progress-fill { height: 100%; border-radius: 2px; }
+  .progress-fill.err { background: var(--err); }
+  .progress-fill.warn { background: var(--warn); }
+  .progress-fill.ok { background: var(--ok); }
+  .findings { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+  .finding { font-size: 12.5px; display: flex; align-items: flex-start; gap: 8px; color: var(--text-muted); }
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    flex-shrink: 0; margin-top: 5px;
+  }
+  .dot.err { background: var(--err); }
+  .dot.warn { background: var(--warn); }
+  .dot.ok { background: var(--ok); }
+  .finding-text { line-height: 1.4; }
+  .finding-text strong { color: var(--text); font-weight: 600; }
+
+  /* STATUS TAGS */
+  .tag { display: inline-block; font-size: 10.5px; font-weight: 600; padding: 2px 7px; border-radius: 3px; letter-spacing: .04em; text-transform: uppercase; }
+  .tag.err { background: var(--err-bg); color: var(--err); }
+  .tag.warn { background: var(--warn-bg); color: var(--warn); }
+  .tag.ok { background: var(--ok-bg); color: var(--ok); }
+
+  /* DETALLE TÉCNICO */
+  details { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-top: 8px; }
+  details + details { margin-top: 8px; }
+  summary {
+    padding: 16px 24px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13.5px;
+    color: var(--text);
+    background: var(--surface);
+    user-select: none;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  summary::after { content: '+'; color: var(--text-faint); font-size: 18px; font-weight: 300; }
+  details[open] summary::after { content: '−'; }
+  summary:hover { background: var(--bg); }
+  .detail-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .detail-table th { background: var(--bg); padding: 10px 20px; text-align: left; font-weight: 600; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-faint); border-bottom: 1px solid var(--border); }
+  .detail-table td { padding: 11px 20px; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--text-muted); }
+  .detail-table td:first-child { font-weight: 600; color: var(--text); }
+  .detail-table tr:last-child td { border-bottom: none; }
+  .detail-table code { font-family: 'Consolas', monospace; font-size: 12px; background: var(--bg); padding: 1px 5px; border-radius: 3px; color: var(--text); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 28px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-faint);
+    max-width: 100%;
+  }
+  footer strong { color: var(--err); }
+
+  @media (max-width: 768px) {
+    .header-inner { grid-template-columns: 1fr; }
+    .cards { grid-template-columns: repeat(2, 1fr); }
+    .cat-grid { grid-template-columns: 1fr; }
+    .container { padding: 32px 20px; }
+    nav { padding: 0 20px; }
+    .header { padding: 36px 20px 32px; }
+    footer { flex-direction: column; gap: 8px; text-align: center; padding: 20px; }
+  }
+  @media print {
+    nav { display: none; }
+    details { break-inside: avoid; }
+    details[open] { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-brand">Auditoría SEO</span>
+  <a href="#resumen">Resumen</a>
+  <a href="#correcciones">Correcciones</a>
+  <a href="#categorias">Categorías</a>
+  <a href="#tecnico">Técnico</a>
+  <a href="#imagenes">Imágenes</a>
+  <a href="#enlaces">Enlaces</a>
+</nav>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="header-left">
+      <div class="header-meta">
+        <img
+          class="header-logo"
+          src="https://grupotudescanso.com/wp-content/uploads/2024/10/logo-web-tu-descanso-new.png"
+          alt="Grupo Tu Descanso"
+          onerror="this.style.display='none'"
+        >
+        <div class="header-divider"></div>
+        <span class="header-label">Informe SEO</span>
+      </div>
+      <div>
+        <div class="header-url">grupotudescanso.com</div>
+        <div class="header-sub" style="margin-top:6px">8 de mayo de 2026 · Análisis completo de posicionamiento orgánico</div>
+      </div>
+      <div class="header-tech">
+        <span class="tech-tag">WordPress 6.9.4</span>
+        <span class="tech-tag">Divi 4.27.4</span>
+        <span class="tech-tag">33 páginas indexadas</span>
+        <span class="tech-tag">Respuesta 0.187s</span>
+        <span class="tech-tag">HTTPS ✓</span>
+      </div>
+    </div>
+    <div class="score-box">
+      <div class="score-num">36</div>
+      <div class="score-den">/ 100</div>
+      <div class="score-verdict">Crítico</div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- RESUMEN -->
+  <section id="resumen">
+    <div class="section-title">Resumen ejecutivo</div>
+    <div class="cards">
+      <div class="card score">
+        <div class="card-num">36</div>
+        <div class="card-label">Puntuación global</div>
+      </div>
+      <div class="card err">
+        <div class="card-num">8</div>
+        <div class="card-label">Problemas críticos</div>
+      </div>
+      <div class="card warn">
+        <div class="card-num">7</div>
+        <div class="card-label">Advertencias</div>
+      </div>
+      <div class="card ok">
+        <div class="card-num">6</div>
+        <div class="card-label">Tests aprobados</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CORRECCIONES -->
+  <section id="correcciones">
+    <div class="section-title">Top 5 correcciones prioritarias</div>
+    <div class="fix-list">
+
+      <div class="fix">
+        <div class="fix-num">1</div>
+        <div>
+          <div class="fix-title">Falta etiqueta H1 en la página principal</div>
+          <div class="fix-why">El H1 es la señal más directa que Google usa para identificar el tema principal de una página. Sin H1, el motor de búsqueda no sabe por qué keyword debe posicionar esta URL. La página tiene múltiples H2 pero ningún H1, lo que rompe la jerarquía semántica completa.</div>
+          <div class="fix-label">Solución</div>
+          <pre class="code">&lt;h1&gt;Colchones y Sofás en Aranjuez y Valdemoro | Grupo Tu Descanso&lt;/h1&gt;</pre>
+        </div>
+      </div>
+
+      <div class="fix">
+        <div class="fix-num">2</div>
+        <div>
+          <div class="fix-title">No existe meta description en ninguna página</div>
+          <div class="fix-why">La meta description es el texto que aparece bajo el título en Google. Sin ella, el buscador elige fragmentos de texto aleatorios de la página, lo que reduce el CTR notablemente. Es la "publicidad" de cada resultado en los buscadores. Instalar Yoast SEO o Rank Math (gratuitos para WordPress) resuelve esto de forma sistemática para todo el sitio.</div>
+          <div class="fix-label">Ejemplo para homepage</div>
+          <pre class="code">&lt;meta name="description" content="Tiendas de colchones y sofás en Aranjuez y Valdemoro. Más de 20 marcas seleccionadas. Asesoramiento personalizado y financiación disponible. ¡Visítanos!"&gt;
+&lt;!-- 150 caracteres — ideal para Google --&gt;</pre>
+        </div>
+      </div>
+
+      <div class="fix">
+        <div class="fix-num">3</div>
+        <div>
+          <div class="fix-title">Title roto — termina en "|" sin contenido</div>
+          <div class="fix-why">El title actual es <code style="background:#f0f0ee;padding:1px 5px;border-radius:3px;font-size:12px">"Grupo Tu Descanso |"</code> — 18 caracteres, pipe colgante al final. Google lo muestra así en los resultados: se ve incompleto y poco profesional. Además no contiene ninguna keyword de negocio. El rango óptimo es 50–60 caracteres.</div>
+          <div class="fix-label">Title recomendado</div>
+          <pre class="code">Colchones y Sofás en Aranjuez y Valdemoro | Grupo Tu Descanso
+↑ 62 caracteres · incluye keyword local · cierra con marca</pre>
+        </div>
+      </div>
+
+      <div class="fix warn">
+        <div class="fix-num" style="background:var(--warn)">4</div>
+        <div>
+          <div class="fix-title">Sin Open Graph ni Twitter Cards</div>
+          <div class="fix-why">Al compartir la web en WhatsApp, Facebook o Instagram, el enlace aparece sin imagen, sin título y sin descripción. Cada compartición es una oportunidad de tráfico perdida. Yoast o Rank Math generan estas etiquetas automáticamente al configurar el plugin.</div>
+          <div class="fix-label">Etiquetas necesarias en &lt;head&gt;</div>
+          <pre class="code">&lt;meta property="og:title" content="Colchones y Sofás en Aranjuez y Valdemoro | Tu Descanso"&gt;
+&lt;meta property="og:description" content="Tiendas en Aranjuez y Valdemoro. Colchones, sofás y sillones de las mejores marcas."&gt;
+&lt;meta property="og:image" content="https://grupotudescanso.com/wp-content/uploads/2024/10/logo-web-tu-descanso-new.png"&gt;
+&lt;meta property="og:type" content="website"&gt;
+&lt;meta property="og:url" content="https://grupotudescanso.com/"&gt;</pre>
+        </div>
+      </div>
+
+      <div class="fix warn">
+        <div class="fix-num" style="background:var(--warn)">5</div>
+        <div>
+          <div class="fix-title">Sin Schema.org — se pierden rich snippets y SEO local</div>
+          <div class="fix-why">El sitio tiene 3 tiendas físicas en Aranjuez y Valdemoro. Sin Schema LocalBusiness, Google no puede mostrar dirección, teléfono y horarios directamente en los resultados. Se pierde visibilidad en búsquedas locales tipo "sofás cerca de mí" o "colchones Aranjuez", que son exactamente las más valiosas para este negocio.</div>
+          <div class="fix-label">JSON-LD recomendado (uno por tienda)</div>
+          <pre class="code">&lt;script type="application/ld+json"&gt;
+{
+  "@context": "https://schema.org",
+  "@type": "FurnitureStore",
+  "name": "Tu Descanso Aranjuez",
+  "url": "https://grupotudescanso.com",
+  "telephone": "+34XXXXXXXXX",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "C. del Rey, 62",
+    "addressLocality": "Aranjuez",
+    "addressRegion": "Madrid",
+    "addressCountry": "ES"
+  },
+  "openingHours": "Mo-Fr 10:00-20:00",
+  "priceRange": "€€"
+}
+&lt;/script&gt;</pre>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CATEGORÍAS -->
+  <section id="categorias">
+    <div class="section-title">Desglose por categoría</div>
+    <div class="cat-grid">
+
+      <div class="cat-card">
+        <div class="cat-header">
+          <span class="cat-name">Meta Tags <span class="cat-weight">peso 20%</span></span>
+          <span class="cat-score err">35</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill err" style="width:35%"></div></div>
+        <ul class="findings">
+          <li class="finding"><span class="dot err"></span><span class="finding-text"><strong>Meta description ausente</strong> — crítico para CTR en Google</span></li>
+          <li class="finding"><span class="dot err"></span><span class="finding-text"><strong>Title roto</strong> — "Grupo Tu Descanso |" · 18 chars · pipe colgante</span></li>
+          <li class="finding"><span class="dot err"></span><span class="finding-text"><strong>Open Graph</strong> — completamente ausente</span></li>
+          <li class="finding"><span class="dot err"></span><span class="finding-text"><strong>Twitter Cards</strong> — completamente ausente</span></li>
+          <li class="finding"><span class="dot ok"></span><span class="finding-text">Canonical correcto — https://grupotudescanso.com/</span></li>
+          <li class="finding"><span class="dot ok"></span><span class="finding-text">lang="es" definido en &lt;html&gt;</span></li>
+          <li class="finding"><span class="dot ok"></span><span class="finding-text">Viewport presente</span></li>
+          <li class="finding"><span class="dot warn"></span><span class="finding-text"><strong>user-scalable=0</strong> en viewport — bloquea zoom en móvil</span></li>
+        </ul>
+      </div>
+
+      <div class="cat-card">
+        <div class="cat-header">
+          <span class="cat-name">Headings <span class="cat-weight">peso 15%</span></span>
+          <span class="cat-score err">20</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill err" style="width:20%"></div></div>
+        <ul class="findings">
+          <li class="finding"><span class="dot err"></span><span class="finding-text"><strong>H1 inexistente</strong> — señal SEO primaria ausente</span></li>
+          <li class="finding"><span class="dot err"></span><span class="finding-text"><strong>Múltiples H2 sin H1</strong> — jerarquía semántica rota</span></li>
+          <li class="finding"><span class="dot warn"></span><span class="finding-text">Saltos H2 → H4 sin H3 intermedio</span></li>
+          <li class="finding"><span class="dot warn"></span><span class="finding-text">H5 usados en navegación — semánticamente incorrecto</span></li>
+          <li class="finding"><span class="dot ok"></span><span class="finding-text">H2s con contenido descriptivo del negocio</span></li>
+        </ul>
+      </div>
+
+      <div class="cat-card">
+        <div class="cat-header">
+          <span class="cat-name">Imágenes <span class="cat-weight">peso 10%</span></span>
+          <span class="cat-score err">25</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill err" style="width:25%"></div></div>
+        <ul class="findings">
+          <li class="finding"><span class="dot err"></span><span class="finding-text"><strong>7 imágenes sin atributo alt</strong> — upholsterer-66, upholsterer-26, colchon-royal, sofa-gino…</span></li>
+          <li class="finding"><span class="dot err"></span><span class="finding-text"><strong>~15 alts = nombre de archivo</strong> — icono-sofa, icono-dormir, etc. — no descriptivos</span></li>
+          <li class="finding"><span class="dot err"></span><span class="finding-text"><strong>0 imágenes con lazy loading</strong> — 44 imágenes cargan simultáneamente</span></li>
+          <li class="finding"><span class="dot warn"></span><span class="finding-text">Solo 1 WebP de 44 imágenes totales — resto JPG/PNG sin optimizar</span></li>
+          <li class="finding"><span class="dot ok"></span><span class="finding-text">Logo con alt="Grupo Tu Descanso" correcto</span></li>
+        </ul>
+      </div>
+
+      <div class="cat-card">
+        <div class="cat-header">
+          <span class="cat-name">Enlaces <span class="cat-weight">peso 10%</span></span>
+          <span class="cat-score warn">60</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill warn" style="width:60%"></div></div>
+        <ul class="findings">
+          <li class="finding"><span class="dot ok"></span><span class="finding-text">29 enlaces internos — navegación completa</span></li>
+          <li class="finding"><span class="dot ok"></span><span class="finding-text">Todas las páginas del sitemap enlazadas</span></li>
+          <li class="finding"><span class="dot warn"></span><span class="finding-text">19 enlaces externos a proveedores sin rel="noopener"</span></li>
+          <li class="finding"><span class="dot warn"></span><span class="finding-text">Anchor texts genéricos en algunos enlaces</span></li>
+        </ul>
+      </div>
+
+      <div class="cat-card">
+        <div class="cat-header">
+          <span class="cat-name">Open Graph &amp; Social <span class="cat-weight">peso 10%</span></span>
+          <span class="cat-score err">0</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill err" style="width:0%"></div></div>
+        <ul class="findings">
+          <li class="finding"><span class="dot err"></span><span class="finding-text">og:title — ausente</span></li>
+          <li class="finding"><span class="dot err"></span><span class="finding-text">og:description — ausente</span></li>
+          <li class="finding"><span class="dot err"></span><span class="finding-text">og:image — ausente</span></li>
+          <li class="finding"><span class="dot err"></span><span class="finding-text">og:url — ausente</span></li>
+          <li class="finding"><span class="dot err"></span><span class="finding-text">twitter:card — ausente</span></li>
+          <li class="finding"><span class="dot err"></span><span class="finding-text">twitter:image — ausente</span></li>
+        </ul>
+      </div>
+
+      <div class="cat-card">
+        <div class="cat-header">
+          <span class="cat-name">Schema / Datos Estructurados <span class="cat-weight">peso 10%</span></span>
+          <span class="cat-score err">0</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill err" style="width:0%"></div></div>
+        <ul class="findings">
+          <li class="finding"><span class="dot err"></span><span class="finding-text">JSON-LD ausente — cero datos estructurados</span></li>
+          <li class="finding"><span class="dot err"></span><span class="finding-text">LocalBusiness — ausente (crítico para SEO local con 3 tiendas)</span></li>
+          <li class="finding"><span class="dot err"></span><span class="finding-text">FurnitureStore schema — ausente</span></li>
+          <li class="finding"><span class="dot err"></span><span class="finding-text">BreadcrumbList — ausente</span></li>
+          <li class="finding"><span class="dot err"></span><span class="finding-text">FAQPage — ausente (hay preguntas en la página)</span></li>
+        </ul>
+      </div>
+
+      <div class="cat-card">
+        <div class="cat-header">
+          <span class="cat-name">Técnico <span class="cat-weight">peso 15%</span></span>
+          <span class="cat-score warn">75</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill warn" style="width:75%"></div></div>
+        <ul class="findings">
+          <li class="finding"><span class="dot ok"></span><span class="finding-text">HTTPS activo y certificado válido</span></li>
+          <li class="finding"><span class="dot ok"></span><span class="finding-text">HTTP → HTTPS redirect 301</span></li>
+          <li class="finding"><span class="dot ok"></span><span class="finding-text">Tiempo de respuesta 0.187s — excelente</span></li>
+          <li class="finding"><span class="dot ok"></span><span class="finding-text">Robots.txt presente y configurado correctamente</span></li>
+          <li class="finding"><span class="dot ok"></span><span class="finding-text">Sitemap XML presente — 33 URLs indexadas</span></li>
+          <li class="finding"><span class="dot ok"></span><span class="finding-text">Favicon presente</span></li>
+          <li class="finding"><span class="dot warn"></span><span class="finding-text">user-scalable=0 — bloquea accesibilidad en móvil</span></li>
+          <li class="finding"><span class="dot warn"></span><span class="finding-text">Versión WordPress expuesta en meta generator</span></li>
+        </ul>
+      </div>
+
+      <div class="cat-card">
+        <div class="cat-header">
+          <span class="cat-name">Contenido <span class="cat-weight">peso 10%</span></span>
+          <span class="cat-score warn">60</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill warn" style="width:60%"></div></div>
+        <ul class="findings">
+          <li class="finding"><span class="dot ok"></span><span class="finding-text">~2.850 palabras en homepage — volumen adecuado</span></li>
+          <li class="finding"><span class="dot ok"></span><span class="finding-text">Referencias geográficas explícitas (Aranjuez, Valdemoro)</span></li>
+          <li class="finding"><span class="dot ok"></span><span class="finding-text">Categorías de producto bien estructuradas</span></li>
+          <li class="finding"><span class="dot err"></span><span class="finding-text">Title sin keyword objetivo de negocio</span></li>
+          <li class="finding"><span class="dot err"></span><span class="finding-text">Sin meta description — contenido no representado en SERPs</span></li>
+          <li class="finding"><span class="dot warn"></span><span class="finding-text">Blog existente pero sin artículos visibles</span></li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- TÉCNICO -->
+  <section id="tecnico">
+    <div class="section-title">Detalle técnico</div>
+
+    <details open>
+      <summary>Checks técnicos completos</summary>
+      <table class="detail-table">
+        <thead>
+          <tr><th>Check</th><th>Valor detectado</th><th>Estado</th><th>Acción</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>HTTPS</td><td>Activo</td><td><span class="tag ok">OK</span></td><td>—</td></tr>
+          <tr><td>HTTP → HTTPS redirect</td><td>301 Moved Permanently</td><td><span class="tag ok">OK</span></td><td>—</td></tr>
+          <tr><td>Tiempo de respuesta</td><td>0.187s</td><td><span class="tag ok">OK</span></td><td>Excelente (&lt; 0.5s)</td></tr>
+          <tr><td>HTTP status</td><td>200 OK</td><td><span class="tag ok">OK</span></td><td>—</td></tr>
+          <tr><td>robots.txt</td><td>Presente · bloquea /wp-admin/</td><td><span class="tag ok">OK</span></td><td>—</td></tr>
+          <tr><td>Sitemap</td><td>wp-sitemap.xml · 33 páginas</td><td><span class="tag ok">OK</span></td><td>—</td></tr>
+          <tr><td>Favicon</td><td>icono-150x150.png</td><td><span class="tag ok">OK</span></td><td>—</td></tr>
+          <tr><td>lang atributo</td><td><code>lang="es"</code></td><td><span class="tag ok">OK</span></td><td>—</td></tr>
+          <tr><td>Canonical tag</td><td>https://grupotudescanso.com/</td><td><span class="tag ok">OK</span></td><td>—</td></tr>
+          <tr><td>Title</td><td><code>"Grupo Tu Descanso |"</code> · 18 chars</td><td><span class="tag err">Error</span></td><td>Completar · 50–60 chars · incluir keyword</td></tr>
+          <tr><td>Meta description</td><td>Ausente</td><td><span class="tag err">Error</span></td><td>Añadir 150–160 chars por página</td></tr>
+          <tr><td>H1</td><td>Ausente</td><td><span class="tag err">Error</span></td><td>Añadir 1 H1 único con keyword</td></tr>
+          <tr><td>Open Graph</td><td>Sin etiquetas og:</td><td><span class="tag err">Error</span></td><td>Instalar Yoast / RankMath</td></tr>
+          <tr><td>Twitter Cards</td><td>Sin etiquetas twitter:</td><td><span class="tag err">Error</span></td><td>Instalar Yoast / RankMath</td></tr>
+          <tr><td>Schema JSON-LD</td><td>Ausente</td><td><span class="tag err">Error</span></td><td>LocalBusiness + FurnitureStore</td></tr>
+          <tr><td>Viewport</td><td><code>user-scalable=0</code></td><td><span class="tag warn">Aviso</span></td><td>Eliminar user-scalable=0</td></tr>
+          <tr><td>Lazy loading</td><td>No implementado</td><td><span class="tag err">Error</span></td><td>Añadir loading="lazy" en imágenes</td></tr>
+          <tr><td>Imágenes sin alt</td><td>7 imágenes</td><td><span class="tag err">Error</span></td><td>Añadir alt descriptivo</td></tr>
+          <tr><td>Formatos de imagen</td><td>JPG/PNG · solo 1 WebP</td><td><span class="tag warn">Aviso</span></td><td>Convertir a WebP</td></tr>
+          <tr><td>Versión CMS expuesta</td><td>WordPress 6.9.4 en meta</td><td><span class="tag warn">Aviso</span></td><td>Ocultar con plugin de seguridad</td></tr>
+        </tbody>
+      </table>
+    </details>
+  </section>
+
+  <!-- IMÁGENES -->
+  <section id="imagenes">
+    <div class="section-title">Auditoría de imágenes — 44 imágenes detectadas</div>
+    <details>
+      <summary>Ver tabla completa de imágenes</summary>
+      <table class="detail-table">
+        <thead>
+          <tr><th>Archivo</th><th>Alt text</th><th>Lazy</th><th>Formato</th><th>Estado</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>logo-web-tu-descanso-new.png</td><td>"Grupo Tu Descanso"</td><td>—</td><td>PNG</td><td><span class="tag ok">OK</span></td></tr>
+          <tr><td>upholsterer-66-scaled-1.jpg</td><td>Vacío</td><td>—</td><td>JPG</td><td><span class="tag err">Error</span></td></tr>
+          <tr><td>upholsterer-26.jpg</td><td>Vacío</td><td>—</td><td>JPG</td><td><span class="tag err">Error</span></td></tr>
+          <tr><td>sofas-cuadrado-4.jpg</td><td>"Sofás Tu Descanso"</td><td>—</td><td>JPG</td><td><span class="tag warn">Genérico</span></td></tr>
+          <tr><td>sofas-cuadrado-3.jpg</td><td>"Sofás Tu Descanso"</td><td>—</td><td>JPG</td><td><span class="tag warn">Genérico</span></td></tr>
+          <tr><td>icono-sofa.png</td><td>"icono-sofa"</td><td>—</td><td>PNG</td><td><span class="tag err">Filename</span></td></tr>
+          <tr><td>icono-dormir.png</td><td>"icono-dormir"</td><td>—</td><td>PNG</td><td><span class="tag err">Filename</span></td></tr>
+          <tr><td>icono-colchon.png</td><td>"icono-colchon"</td><td>—</td><td>PNG</td><td><span class="tag err">Filename</span></td></tr>
+          <tr><td>icono-tiendas.png</td><td>"icono-tiendas"</td><td>—</td><td>PNG</td><td><span class="tag err">Filename</span></td></tr>
+          <tr><td>colchon-royal.png</td><td>Vacío</td><td>—</td><td>PNG</td><td><span class="tag err">Error</span></td></tr>
+          <tr><td>sofa-gino-torresol-n.jpg</td><td>Vacío</td><td>—</td><td>JPG</td><td><span class="tag err">Error</span></td></tr>
+          <tr><td>banner-pie-aranjuuez-sofas.jpg</td><td>Vacío</td><td>—</td><td>JPG</td><td><span class="tag err">Error</span></td></tr>
+          <tr><td>logo-magicama.webp</td><td>"logo magicama"</td><td>—</td><td>WebP ✓</td><td><span class="tag ok">OK</span></td></tr>
+          <tr><td>tienda-tudescanso-aranjuez.jpg</td><td>"Tienda Tu Descanso Aranjuez"</td><td>—</td><td>JPG</td><td><span class="tag ok">OK</span></td></tr>
+          <tr><td>banner-pie-valdemoro.jpg</td><td>"Tu Descanso Valdemoro"</td><td>—</td><td>JPG</td><td><span class="tag ok">OK</span></td></tr>
+          <tr><td colspan="5" style="color:var(--text-faint);font-style:italic">+ 29 logos de marcas proveedoras (mayoría con alt aceptable)</td></tr>
+        </tbody>
+      </table>
+    </details>
+  </section>
+
+  <!-- ENLACES -->
+  <section id="enlaces">
+    <div class="section-title">Estructura de enlazado — 29 internos · 19 externos</div>
+    <details>
+      <summary>Ver análisis de enlaces</summary>
+      <table class="detail-table">
+        <thead>
+          <tr><th>URL</th><th>Tipo</th><th>Estado</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>grupotudescanso.com/colchones/</td><td>Interno</td><td><span class="tag ok">OK</span></td></tr>
+          <tr><td>grupotudescanso.com/sofas/</td><td>Interno</td><td><span class="tag ok">OK</span></td></tr>
+          <tr><td>grupotudescanso.com/las-tiendas/</td><td>Interno</td><td><span class="tag ok">OK</span></td></tr>
+          <tr><td>grupotudescanso.com/blog/</td><td>Interno</td><td><span class="tag ok">OK</span></td></tr>
+          <tr><td>grupotudescanso.com/contacto/</td><td>Interno</td><td><span class="tag ok">OK</span></td></tr>
+          <tr><td>grupotudescanso.com/aviso-legal/</td><td>Interno</td><td><span class="tag ok">OK</span></td></tr>
+          <tr><td>acomodel.eu/es/</td><td>Externo · proveedor</td><td><span class="tag warn">Sin noopener</span></td></tr>
+          <tr><td>torresolpiel.com/</td><td>Externo · proveedor</td><td><span class="tag warn">Sin noopener</span></td></tr>
+          <tr><td>instagram.com/colchoneria_tu_descanso</td><td>Externo · social</td><td><span class="tag ok">OK</span></td></tr>
+          <tr><td colspan="3" style="color:var(--text-faint);font-style:italic">+ 10 páginas de producto · + 10 páginas externas de proveedores</td></tr>
+        </tbody>
+      </table>
+    </details>
+  </section>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span>Auditoría SEO · grupotudescanso.com · 8 mayo 2026</span>
+  <span>Puntuación global: <strong>36 / 100</strong> — Reauditar tras aplicar correcciones prioritarias</span>
+</footer>
+
+</body>
+</html>
