@@ -274,13 +274,47 @@
   footer strong { color: var(--err); }
 
   @media (max-width: 768px) {
-    .header-inner { grid-template-columns: 1fr; }
+    /* layout */
+    .container { padding: 24px 16px; }
+    nav { padding: 0 16px; }
+    .header { padding: 28px 16px 24px; }
+    footer { flex-direction: column; gap: 8px; text-align: center; padding: 16px; }
+
+    /* header */
+    .header-inner { grid-template-columns: 1fr; gap: 24px; }
+    .score-box { flex-direction: row; gap: 20px; align-items: center; padding: 20px 24px; min-width: unset; }
+    .score-num { font-size: 48px; }
+
+    /* resumen cards */
     .cards { grid-template-columns: repeat(2, 1fr); }
+
+    /* correcciones */
+    .fix { grid-template-columns: 32px 1fr; gap: 12px; padding: 18px 16px; }
+    .fix-num { width: 24px; height: 24px; font-size: 11px; }
+    pre.code { font-size: 11px; padding: 10px 12px; }
+
+    /* categorías */
     .cat-grid { grid-template-columns: 1fr; }
-    .container { padding: 32px 20px; }
-    nav { padding: 0 20px; }
-    .header { padding: 36px 20px 32px; }
-    footer { flex-direction: column; gap: 8px; text-align: center; padding: 20px; }
+
+    /* tablas: scroll horizontal */
+    details .detail-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; white-space: nowrap; }
+
+    /* impacto económico */
+    .impact-market { grid-template-columns: repeat(2, 1fr) !important; }
+    .impact-compare { grid-template-columns: 1fr !important; }
+    .impact-money { grid-template-columns: 1fr !important; }
+    .impact-header { flex-direction: column; gap: 6px; align-items: flex-start !important; }
+    .impact-money > div { border-left: none !important; border-right: none !important; border-top: 1px solid #f5c6c3; }
+    .impact-money > div:first-child { border-top: none; }
+  }
+
+  @media (max-width: 480px) {
+    .cards { grid-template-columns: 1fr 1fr; }
+    .impact-market { grid-template-columns: 1fr 1fr !important; }
+    .header-url { font-size: 20px; }
+    .score-num { font-size: 40px; }
+    nav a { padding: 12px 10px; font-size: 12px; }
+    .nav-brand { display: none; }
   }
   @media print {
     nav { display: none; }
@@ -374,7 +408,7 @@
     </div>
 
     <!-- FILA 1: contexto del mercado -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:20px">
+    <div class="impact-market" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:20px">
       <div style="background:var(--surface);padding:24px 20px">
         <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint);margin-bottom:8px">Área de captación</div>
         <div style="font-size:32px;font-weight:800;color:var(--text);letter-spacing:-.03em">204.000</div>
@@ -398,7 +432,7 @@
     </div>
 
     <!-- FILA 2: CTR actual vs potencial -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+    <div class="impact-compare" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
 
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:24px 28px">
         <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint);margin-bottom:16px">Situación actual (SEO roto)</div>
@@ -477,11 +511,11 @@
 
     <!-- EL GOLPE: DINERO PERDIDO -->
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden">
-      <div style="padding:20px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+      <div class="impact-header" style="padding:20px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
         <div style="font-size:14px;font-weight:700;color:var(--text)">Estimación de ingresos no captados</div>
         <div style="font-size:11px;color:var(--text-faint);font-weight:500">Tasa conversión web→compra: 3.5% · Ticket medio: €620</div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border)">
+      <div class="impact-money" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border)">
         <div style="background:var(--surface);padding:28px 24px;text-align:center">
           <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint);margin-bottom:12px">Clientes perdidos/mes</div>
           <div style="font-size:48px;font-weight:800;color:var(--err);letter-spacing:-.04em;line-height:1">~4</div>
